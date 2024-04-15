@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Schedule</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@2.3.0/build/global/luxon.min.js"></script>
+</head>
+
+<body class="flex flex-col justify-center items-center">
+    <div class="p-6">
+        <h1 class="text-3xl font-bold text-center mb-4">Workout Schedule</h1>
+
+        <!-- Week navigation -->
+        <div class="flex justify-between items-center mb-4">
+            <button id="prevWeek" class="text-xl">&#8249;</button>
+            <span id="currentMonth" class="text-xl font-bold"></span>
+            <button id="nextWeek" class="text-xl">&#8250;</button>
+        </div>
+
+        <!-- Days of the week and dates headers -->
+        <div class="grid grid-cols-5 gap-4" id="dayDateHeaders">
+            <!-- Days of the week headers and dates will be rendered here -->
+        </div>
+
+        <!-- Time slots for the selected date -->
+        <div id="timeSlots" class="mt-4">
+            <!-- Time slots will be rendered here when a date is selected -->
+        </div>
+
+        <!-- Add event button -->
+        <div class="fixed bottom-20 right-4">
+            <button id="addEvent" class="bg-gradient-to-r from-blue-300 to-blue-500 text-white rounded-full w-10 h-10 flex justify-center items-center">
+                +
+            </button>
+        </div>
+    </div>
+    <!-- Navigation Tabs -->
+    <nav class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t-2 border-gray-300">
+        <div class="flex justify-around">
+            <a href="#" class="text-gray-700 flex flex-col items-center">
+                <img src="../assets/images/home.png" alt="">
+            </a>
+            <a href="#" class="text-gray-700 flex flex-col items-center mr-10">
+                <img src="../assets/images/growth.png" alt="">
+            </a>
+            <button class="absolute top-0 transform -translate-y-1/2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-200 to-blue-400 text-white rounded-full p-6">
+                <img src="../assets/images/Vector(3).png" alt="Search" class="w-5 h-5">
+            </button>
+            <a href="#" class="text-gray-700 flex flex-col items-center ml-10">
+                <img src="../assets/images/Vector(2).png" alt="">
+            </a>
+            <a href="#" class="text-gray-700 flex flex-col items-center">
+                <img src="../assets/images/Group.png" alt="">
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        const { DateTime } = luxon;
+        let currentDate = DateTime.local();
+        let selectedDate = null;
+
+        // Function to update the month display
+        function updateMonthDisplay() {
+            const monthName = currentDate.toFormat('MMMM yyyy');
+            document.getElementById('currentMonth').textContent = monthName;
+            renderDayDateHeaders();
+        }
+
+        // Function to render day of the week and date headers
+        function renderDayDateHeaders() {
+            const headers = document.getElementById('dayDateHeaders');
+            headers.innerHTML = '';
+
+            // Calculate the starting date for the week
+            const startOfWeek = currentDate.startOf('week');
+            const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+            // Render the headers and dates
+            for (let i = 0; i < 5; i++) {
+                // Calculate the current date in the loop
+                const date = startOfWeek.plus({ days: i });
+                const dateDiv = document.createElement('div');
+                
+                // Add necessary classes and styles for equal spacing, rounded edges, and shadows
+                dateDiv.classList.add('flex', 'flex-col', 'items-center', 'justify-center', 'p-2', 'rounded', 'shadow');
+                dateDiv.style.backgroundColor = 'white';
+
+                // Display the day of the week and the date
+                const weekdayIndex = date.weekday - 1; // Subtracting 1 to get array index (0 for Sunday)
+                dateDiv.innerHTML = `<span>${daysOfWeek[weekdayIndex]} ${date.day}</span>`;
+
+                // Add an attribute to track the date
+                dateDiv.setAttribute('data-date', date.toISODate());
+
+                // Add event listener for selecting date
+                dateDiv.addEventListener('click', () => {
+                    handleDateClick(dateDiv, date);
+                });
+
+                // Append the date header to the container
+                headers.appendChild(dateDiv);
+            }
+        }
+
+        // Function to render time slots for the selected date
+        function renderTimeSlots() {
+            const timeSlots = document.getElementById('timeSlots');
+            timeSlots.innerHTML = ''; // Clear existing time slots
+
+            if (selectedDate) {
+                // Render time slots from 6:00 AM to 10:00 PM for the selected date
+                for (let hour = 6; hour <= 22; hour++) {
+                    for (let minute = 0; minute < 60; minute += 15) {
+                        const timeSlot = document.createElement('div');
+                        
+                        // Add necessary classes and styles for the desired time slot appearance
+                        timeSlot.classList.add('flex', 'justify-between', 'items-center', 'border-t', 'border-b', 'p-2');
+                        
+                        // Format the time slot (e.g., "6:00 AM")
+                        const time = DateTime.fromObject({ hour, minute }).toFormat('h:mm a');
+                        const timeText = document.createElement('span');
+                        timeText.textContent = time;
+
+                        // Create a container for scheduled events
+                        const eventContainer = document.createElement('div');
+                        eventContainer.classList.add('flex-grow', 'ml-2');
+                        eventContainer.setAttribute('data-time', time);
+
+                        // Add elements to the time slot
+                        timeSlot.appendChild(timeText);
+                        timeSlot.appendChild(eventContainer);
+
+                        // Append the time slot to the timeSlots container
+                        timeSlots.appendChild(timeSlot);
+
+                        // Manually add predefined events for Monday
+                        if (selectedDate.weekday === 1) {
+                            // Monday-specific events
+                            if (time === '7:30 AM') {
+                                const eventDiv1 = document.createElement('div');
+                                eventDiv1.textContent = 'Ab Workout, 7:30am';
+                                eventDiv1.classList.add('bg-gradient-to-b from-pink-500 to-purple-500', 'rounded', 'p-1', 'mb-1');
+                                eventContainer.appendChild(eventDiv1);
+                            }
+                            if (time === '8:30 AM') {
+                                const eventDiv2 = document.createElement('div');
+                                eventDiv2.textContent = 'Upperbody Workout, 9am';
+                                eventDiv2.classList.add('bg-gradient-to-b from-pink-500 to-purple-500', 'rounded', 'p-1', 'mb-1');
+                                eventContainer.appendChild(eventDiv2);
+                            }
+                            if (time === '2:00 PM') {
+                                const eventDiv3 = document.createElement('div');
+                                eventDiv3.textContent = 'Upperbody Workout';
+                                eventDiv3.classList.add('bg-gradient-to-b from-pink-500 to-purple-500', 'rounded', 'p-1', 'mb-1');
+                                eventContainer.appendChild(eventDiv3);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Handle date click event
+        function handleDateClick(dateDiv, date) {
+            // Clear previous selections
+            const previousSelection = document.querySelector('#dayDateHeaders .bg-blue-200');
+            if (previousSelection) {
+                previousSelection.classList.remove('bg-blue-200');
+                previousSelection.style.backgroundColor = 'white';
+                previousSelection.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+            }
+
+            // Update selected date division style
+            dateDiv.classList.add('bg-blue-200');
+            dateDiv.style.backgroundColor = '#4299E1'; // Blue color
+
+            // Update the selected date
+            selectedDate = date;
+
+            // Render time slots for the selected date
+            renderTimeSlots();
+        }
+
+        // Event listener for the add event button
+        document.getElementById('addEvent').addEventListener('click', () => {
+            if (selectedDate) {
+                // Prompt the user to enter the event details
+                const eventDetails = prompt('Enter event details:');
+                
+                // If the user entered event details, create the event
+                if (eventDetails) {
+                    // Prompt the user to specify the time of the event
+                    const timeSlot = prompt('Enter time (e.g., 6:00 AM):');
+                    
+                    // Find the time slot element corresponding to the specified time
+                    const timeSlotElement = document.querySelector(`div[data-time="${timeSlot}"]`);
+
+                    if (timeSlotElement) {
+                        // Create a new div for the event
+                                                const eventDiv = document.createElement('div');
+                        eventDiv.textContent = eventDetails;
+                        eventDiv.classList.add('bg-pink-200', 'rounded', 'p-1', 'mb-1');
+
+                        // Append the new event to the corresponding time slot container
+                        timeSlotElement.appendChild(eventDiv);
+                    } else {
+                        alert('Invalid time slot entered. Please try again.');
+                    }
+                }
+            } else {
+                alert('Please select a date first.');
+            }
+        });
+
+        // Event listener for navigating to the previous week
+        document.getElementById('prevWeek').addEventListener('click', () => {
+            // Subtract one week from the current date
+            currentDate = currentDate.minus({ weeks: 1 });
+            updateMonthDisplay();
+        });
+
+        // Event listener for navigating to the next week
+        document.getElementById('nextWeek').addEventListener('click', () => {
+            // Add one week to the current date
+            currentDate = currentDate.plus({ weeks: 1 });
+            updateMonthDisplay();
+        });
+
+        // Initial setup: update month display and render headers
+        updateMonthDisplay();
+    </script>
+</body>
+
+</html>

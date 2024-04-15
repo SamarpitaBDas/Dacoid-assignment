@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Imprima&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+    </style>
+</head>
+
+
+<body class="min-h-screen flex flex-col justify-between ">
+    <!-- Header -->
+    <header class="p-4 flex justify-center items-center mt-4">
+        <div class="flex justify-center items-center bg-gray-200 rounded-lg h-10 w-10 mr-10">
+            <h1 class="text-2xl font-bold">&lt;</h1>
+        </div>
+        <h1 class="text-3xl font-bold">Workout Tracker</h1>
+    </header>
+
+    <!-- Content -->
+    <main class="flex-grow p-4 overflow-y-auto">
+        <div class="p-6">
+            <canvas id="calorieBarGraph" class="w-3/4"></canvas>
+        </div>
+        <div class="bg-gradient-to-r from-blue-200 to-gray-100 rounded-lg flex items-center p-4">
+            <img src="../assets/images/alert-triangle.png" alt="Alert" class="mr-2">
+            <span>You've burned fewer calories than yesterday. Time to get moving!</span>
+        </div>
+        <div class="mt-5">
+            <div>
+                <span class="text-2xl">Upcoming Workout</span>
+                <a href="#" class="text-blue-400 ml-10">See More</a>
+            </div>
+            <div class="shadow-lg p-4 rounded-lg flex items-center">
+                <img src="../assets/images/Ellipse 53.png" alt="">
+                <div class="ml-2">
+                    <span>Full Body Workout</span>
+                    <span class="text-gray-500 block">Today 3pm</span>
+                </div>
+                <div class="ml-auto">
+                    <!-- Toggle Switch -->
+                    <label for="toggleSwitch1" class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="toggleSwitch1" class="sr-only">
+                        <div class="toggle-bg bg-blue-300 w-11 h-6 rounded-full transition-colors duration-300"></div>
+                        <span id="handle1" class="toggle-handle absolute left-0.5 top-0.5 w-5 h-5 bg-white border rounded-full transition-transform duration-300"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="shadow-lg p-4 rounded-lg flex items-center">
+                <img src="../assets/images/Ellipse 54.png" alt="">
+                <div class="ml-2">
+                    <span>Upper Body Workout</span>
+                    <span class="text-gray-500 block">4 Feb, 3:30 pm</span>
+                </div>
+                <div class="ml-auto">
+                    <!-- Toggle Switch -->
+                    <label for="toggleSwitch2" class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="toggleSwitch2" class="sr-only">
+                        <div class="toggle-bg bg-blue-300 w-11 h-6 rounded-full transition-colors duration-300"></div>
+                        <span id="handle2" class="toggle-handle absolute left-0.5 top-0.5 w-5 h-5 bg-white border rounded-full transition-transform duration-300"></span>
+                    </label>
+                </div>
+            </div> 
+        </div>
+        <div class="mt-5">
+            <span class="text-2xl">What Do You Want to Train</span>
+        </div>
+        <div class="bg-blue-200 rounded-lg flex items-center p-4">
+            <div class="flex flex-col ml-3">
+                <span>Full Body Workout</span>
+                <span>Arms</span>
+                <span>Chest</span>
+            </div>
+            <img src="../assets/images/Ellipse 55.png" alt="" class="ml-20">
+        </div>        
+    </main>
+
+    <!-- Navigation Tabs -->
+    <nav class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t-2 border-gray-300">
+        <div class="flex justify-around">
+            <a href="#" class="text-gray-700 flex flex-col items-center">
+                <img src="../assets/images/home.png" alt="">
+            </a>
+            <a href="#" class="text-gray-700 flex flex-col items-center mr-10">
+                <img src="../assets/images/growth.png" alt="">
+            </a>
+            <button class="absolute top-0 transform -translate-y-1/2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-200 to-blue-400 text-white rounded-full p-6">
+                <img src="../assets/images/Vector(3).png" alt="Search" class="w-5 h-5">
+            </button>
+            <a href="#" class="text-gray-700 flex flex-col items-center ml-10">
+                <img src="../assets/images/Vector(2).png" alt="">
+            </a>
+            <a href="#" class="text-gray-700 flex flex-col items-center">
+                <img src="../assets/images/Group.png" alt="">
+            </a>
+        </div>
+    </nav>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const categories = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,29,0,10,0,0,0,0,0,15,35,10,5,0,0,0,10,0,0,0,10,0,0,0,30,10,34,100,40,32,0,0,0,10,0,0,0,0,0,0,0,0,0,0];
+    const calories = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,111,29,1,11,1,1,1,1,1,15,35,11,5,1,1,1,11,1,1,1,11,1,1,1,31,11,34,111,41,32,1,1,1,11,1,1,1,1,1,1,1,1,1,1]; // Example data
+
+const ctx = document.getElementById('calorieBarGraph').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: categories,
+        datasets: [{
+            label: '900CAL',
+            data: calories,
+            backgroundColor: 'rgba(128, 153, 255, 0.6)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 0
+        }]
+    },
+    options: {
+        legend: {
+            display: false // Hide the legend
+        },
+        scales: {
+            y: {
+                display: false, // Hide y-axis markings and grid lines
+            },
+            x: {
+                display: false, // Hide x-axis markings and grid lines
+            }
+        }
+    }
+});
+function handleToggle(event, handleId) {
+    const checkbox = event.target;
+    const handle = document.getElementById(handleId);
+
+    if (checkbox.checked) {
+        handle.style.transform = 'translateX(100%)';
+        handle.parentNode.firstChild.style.backgroundColor = '#668cff';
+    } else {
+        handle.style.transform = 'translateX(0%)';
+        handle.parentNode.firstChild.style.backgroundColor = '#8099FF';
+    }
+}
+document.getElementById('toggleSwitch1').addEventListener('change', function(event) {
+    handleToggle(event, 'handle1');
+});
+
+document.getElementById('toggleSwitch2').addEventListener('change', function(event) {
+    handleToggle(event, 'handle2');
+});
+</script>
+
+</html>
