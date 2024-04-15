@@ -1,7 +1,7 @@
 function switchPage() {
     var currentPath = window.location.pathname;
 
-    if (currentPath.includes('track.html')) {
+    if (currentPath.includes('index.html')) {
         window.location.href = 'get_burn.html';
     } else if (currentPath.includes('get_burn.html')) {
         window.location.href = 'sign_in.html';
